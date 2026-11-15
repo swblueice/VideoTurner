@@ -58,7 +58,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "便携版打包失败" }
 
       - name: 上传便携版 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: VideoTurner-portable
           path: |
