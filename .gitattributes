@@ -1,0 +1,45 @@
+# 统一换行：仓库内一律 LF，检出到 Windows 工作区用 CRLF（.ps1 除外，见下）
+* text=auto eol=lf
+
+# 源码
+*.cs            text diff=csharp
+*.xaml          text
+*.csproj        text
+*.sln           text eol=crlf
+*.props         text
+*.targets       text
+*.manifest      text
+*.json          text
+*.yml           text
+*.yaml          text
+*.md            text
+*.mdx           text
+
+# PowerShell 脚本：本机 PS 5.1 需要 UTF-8 BOM 才能正确解析中文，
+# 且脚本按 Windows 换行保存最稳。
+*.ps1           text eol=crlf
+*.psm1          text eol=crlf
+*.psd1          text eol=crlf
+*.cmd           text eol=crlf
+*.bat           text eol=crlf
+
+# Inno Setup：编译器按 ANSI 读，文件必须是 UTF-8 带 BOM（由构建脚本自动补）
+*.iss           text eol=crlf
+*.isl           text eol=crlf
+
+# 二进制
+*.ico           binary
+*.png           binary
+*.jpg           binary
+*.gif           binary
+*.zip           binary
+*.exe           binary
+*.dll           binary
+*.pdb           binary
+*.pdf           binary
+*.nupkg         binary
+
+# 语言统计：把文档与脚本从 GitHub 语种条里降权
+*.md            linguist-documentation
+docs/*          linguist-documentation
+*.ps1           linguist-language=PowerShell

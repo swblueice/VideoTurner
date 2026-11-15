@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 构建 / 打包
+    runs-on: windows-latest
+
+    steps:
+      - name: 检出
+        uses: actions/checkout@v4
+
+      - name: 安装 .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+
+      - name: 还原
+        run: dotnet restore src/VideoTurner/VideoTurner.csproj
+
+      - name: 构建主程序（Release）
+        run: dotnet build src/VideoTurner/VideoTurner.csproj -c Release --no-restore --nologo -warnaserror:false
+
+      - name: 构建只读探针
+        shell: pwsh
+        run: |
+          $projects = @(
+            'tools/MatcherProbe/MatcherProbe.csproj',
+            'tools/LoopbackProbe/LoopbackProbe.csproj',
+            'tools/ApiProbe/ApiProbe.csproj'
+          )
+          foreach ($p in $projects) {
+            if (Test-Path $p) {
+              Write-Host "==> $p"
+              dotnet build $p -c Release --nologo
+              if ($LASTEXITCODE -ne 0) { throw "构建失败：$p" }
+            }
+          }
+
+      - name: 打便携版 zip
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File tools/make-portable-zip.ps1 -Publish
+          if ($LASTEXITCODE -ne 0) { throw "便携版打包失败" }
+
+      - name: 上传便携版 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoTurner-portable
+          path: |
+            dist/portable/*.zip
+            dist/portable/*.sha256.txt
+          if-no-files-found: error
+          retention-days: 14

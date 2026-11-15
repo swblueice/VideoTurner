@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    虚拟通道探针：验证「抓取某个进程的音频 → 渲染到另一个设备」这条链路在本机是否成立。
+    直接链接 VideoTurner 的源码（不复制文件），不改任何路由设置。
+
+    用法：
+        LoopbackProbe.exe            完整自检（自己起一个放音子进程，抓它，再送到指定设备）
+        LoopbackProbe.exe tone 8     只放 8 秒 440 Hz 测试音（供自检当「目标进程」）
+    参数：
+        target 名称关键字            渲染到哪台设备（默认自动挑一台非系统默认的端点）
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SupportedOSPlatform>windows10.0.17763.0</SupportedOSPlatform>
+    <RootNamespace>LoopbackProbe</RootNamespace>
+    <AssemblyName>LoopbackProbe</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\VideoTurner\Models\*.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\AudioPolicyConfig.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\WasapiInterop.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioDeviceService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioRingBuffer.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioRouterService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioSessionService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\DeviceContainerService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\ProcessChannel.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\ProcessLoopbackCapture.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\RoutingLog.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\WasapiDeviceRenderer.cs" />
+  </ItemGroup>
+
+</Project>

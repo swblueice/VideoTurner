@@ -1,0 +1,80 @@
+name: Bug 报告
+description: 声音没按预期跟着窗口走、界面异常、安装/卸载出错等
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        开 issue 前先扫一眼 [已知限制](https://github.com/swblueice/VideoTurner#已知限制) 与
+        [排错顺序](https://github.com/swblueice/VideoTurner#路由没生效按这个顺序查)：
+        「最小化后声音跑掉」「程序只在启动时读一次设备」这类情况已经在里面写了原因。
+
+        贴日志前请把用户名、机器名、设备名过一遍，只留复现需要的信息。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象
+      description: 期望发生什么，实际发生了什么
+      placeholder: 期望 QQMusic 的声音从副屏的 HDMI 出声，实际还在耳机上。
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: VideoTurner 版本
+      placeholder: v1.0.0（安装版 / 便携版）
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows 版本
+      description: `winver` 里的版本号，例如 23H2 (22631.4317)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 路由模式
+      options:
+        - 直连模式（默认）
+        - 虚拟通道模式
+        - 两种都试过
+        - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: hardware
+    attributes:
+      label: 显示器与音频设备
+      description: 几台屏、什么接口（HDMI / DP / 内置屏）、音频设备名称
+      placeholder: |
+        主屏：内置屏（笔记本）
+        副屏：HDMI，显示器型号 XXX
+        音频设备：HDMI (NVIDIA High Definition Audio)、耳机 (USB)、扬声器 (板载)
+    validations:
+      required: true
+
+  - type: textarea
+    id: selftest
+    attributes:
+      label: 自检报告
+      description: 设置页 →「运行自检」→ 复制整段
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: log
+    attributes:
+      label: routing.log 相关片段
+      description: 路径 `%APPDATA%\VideoTurner\routing.log`，只贴复现前后的几行即可
+      render: text
+    validations:
+      required: false

@@ -1,0 +1,51 @@
+name: 功能建议
+description: 想要新的能力、或者现有行为可以更好
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提之前先看一下 [已知限制](https://github.com/swblueice/VideoTurner#已知限制)：
+        「按窗口而不是按进程路由」「改策略让正在播的音频立刻迁移」这两条受 Windows 未公开接口
+        限制，目前做不到，不是遗漏。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你遇到的问题
+      description: 不用先想方案，先说场景
+      placeholder: 我的游戏只在启动时读一次输出设备，每次换屏都要重启游戏。
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望的解决方式
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 你试过的替代方案
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 涉及的部分
+      multiple: true
+      options:
+        - 自动匹配（显示器 → 音频设备）
+        - 按应用分配 / 应用清单
+        - 虚拟通道
+        - 托盘 / 开机自启
+        - 诊断与日志
+        - 安装包 / 打包
+        - 界面与交互
+        - 其他
+    validations:
+      required: false

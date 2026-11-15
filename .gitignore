@@ -1,0 +1,55 @@
+# ─── 构建产物 ────────────────────────────────────────────────────────────
+bin/
+obj/
+dist/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.binlog
+publish/
+
+# ─── 本机专用工作目录（不进仓库）────────────────────────────────────────────
+# 离线 NuGet 包与包缓存：本机构建用，开源用户从 nuget.org 还原
+.nuget-cache/
+.pkgsrc/
+NuGet.offline.config
+.tmp/
+
+# 参考源码 / 调研下载物（体积大、含第三方上游源码，不随本项目分发）
+reference/
+
+# 会话交接记录（含本机环境与调试细节）
+HANDOFF.md
+remove-todesk-audio.log
+更新并重启.cmd
+
+# 软件著作权登记材料与生成脚本（个人申请流程，不公开发布）
+docs/软著申请/
+tools/make-copyright-package.ps1
+tools/verify-copyright-package.ps1
+
+# 内部调研用的抓取脚本与清单
+tools/gh-download.ps1
+tools/gh-download-list.txt
+tools/gh-clone-related.ps1
+
+# 本机一次性排障脚本
+tools/remove-todesk-audio.ps1
+
+# Inno Setup 编译器本体（第三方二进制，用脚本现装，不入库）
+tools/InnoSetup6/
+
+# ─── 编辑器 / 系统 ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+*~
+*.swp

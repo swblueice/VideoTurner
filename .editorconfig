@@ -1,0 +1,28 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{cs,xaml}]
+indent_size = 4
+
+[*.{json,yml,yaml,xml,csproj,props,targets,config}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+# PowerShell 5.1 解析中文要求 UTF-8 BOM，且用 CRLF 最稳
+[*.{ps1,psm1,psd1}]
+end_of_line = crlf
+charset = utf-8-bom
+
+# Inno Setup 编译器按 ANSI 读，必须 UTF-8 带 BOM
+[*.{iss,isl}]
+end_of_line = crlf
+charset = utf-8-bom

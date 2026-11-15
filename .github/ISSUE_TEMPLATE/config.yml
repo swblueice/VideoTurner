@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 路由没生效 / 声音没跟着走
+    url: https://github.com/swblueice/VideoTurner#路由没生效按这个顺序查
+    about: 先按 README 的四步排查一遍，多数情况在「依次试听各设备」这一步就能看出问题
+  - name: 已知限制
+    url: https://github.com/swblueice/VideoTurner#已知限制
+    about: 粒度是进程不是窗口、最小化窗口会认错屏、程序只在启动时读设备 —— 这些是已记录的
+  - name: 安全问题
+    url: https://github.com/swblueice/VideoTurner/security/advisories/new
+    about: 请不要公开开 issue，用私密漏洞报告

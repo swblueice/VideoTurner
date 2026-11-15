@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    诊断探针：直接调用未公开的 AudioPolicyConfig 接口，把「写进去的设备」读回来核对，
+    用来判断「路由到底有没有生效」「失败时 HRESULT 是多少」。
+    链接 VideoTurner 的源码（不复制文件）。
+
+    只读用法（不改任何东西）：在 tools\ApiProbe 目录下直接 dotnet run
+    写入用法（会把某个进程的输出设备改成指定设备）：
+        加参数 set + pid + 设备名关键字，或加参数 clear + pid
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SupportedOSPlatform>windows10.0.17763.0</SupportedOSPlatform>
+    <RootNamespace>ApiProbe</RootNamespace>
+    <AssemblyName>ApiProbe</AssemblyName>
+    <ApplicationManifest>..\..\src\VideoTurner\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\VideoTurner\Models\*.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\AudioPolicyConfig.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\DisplayConfig.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\NativeMethods.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioSessionService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioDeviceService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\DeviceContainerService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\MonitorService.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,854 @@
+<wpfui:UiWindow x:Class="VideoTurner.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:vm="clr-namespace:VideoTurner.ViewModels"
+        Title="VideoTurner — 多显示器音频路由"
+        Height="720" Width="900"
+        MinHeight="560" MinWidth="720"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        Icon="/Assets/app-icon.png">
+
+    <wpfui:UiWindow.Resources>
+        <!-- 侧边栏导航按钮样式（只有左侧强调色条，没有底色方块） -->
+        <Style x:Key="SidebarNavButton" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Root" Background="Transparent" Padding="0,14">
+                            <Grid>
+                                <Border x:Name="Indicator" Width="3" Height="16"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center"
+                                        CornerRadius="0,2,2,0" Background="Transparent"/>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Indicator" Property="Background" Value="{DynamicResource SystemAccentColorPrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background"
+                                        Value="{DynamicResource SubtleFillColorSecondaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </wpfui:UiWindow.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 侧边栏：不加背景，让 Mica 材质直接透出来（最暗的一层） -->
+
+        <!-- 内容面板：浮在 Mica 之上的半透明卡片，左上角圆角 -->
+        <Border Grid.Column="1" Grid.Row="1" CornerRadius="8,0,0,0"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+
+        <!-- ── 标题栏 ── -->
+        <wpfui:TitleBar Grid.ColumnSpan="2" Grid.Row="0"
+                        Title="VideoTurner — 多显示器音频路由"
+                        ShowMinimize="True" ShowMaximize="True" ShowClose="True"/>
+
+        <!-- ── 侧边栏导航 ── -->
+        <DockPanel Grid.Column="0" Grid.Row="1" LastChildFill="False">
+            <RadioButton DockPanel.Dock="Top" GroupName="Nav" IsChecked="True"
+                         Checked="NavButton_Checked" Tag="0"
+                         Style="{StaticResource SidebarNavButton}">
+                <StackPanel HorizontalAlignment="Center">
+                    <wpfui:SymbolIcon Symbol="Home24" FontSize="22" HorizontalAlignment="Center"
+                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                    <TextBlock Text="首页" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                </StackPanel>
+            </RadioButton>
+
+            <RadioButton DockPanel.Dock="Top" GroupName="Nav"
+                         Checked="NavButton_Checked" Tag="1"
+                         Style="{StaticResource SidebarNavButton}">
+                <StackPanel HorizontalAlignment="Center">
+                    <wpfui:SymbolIcon Symbol="Pin24" FontSize="22" HorizontalAlignment="Center"
+                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                    <TextBlock Text="应用清单" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                </StackPanel>
+            </RadioButton>
+
+            <!--
+                底部停靠的子元素按 XAML 顺序自下而上排列：
+                关于先停靠 → 最底下；设置后停靠 → 在它上面。
+            -->
+            <RadioButton DockPanel.Dock="Bottom" GroupName="Nav"
+                         Checked="NavButton_Checked" Tag="3"
+                         Style="{StaticResource SidebarNavButton}">
+                <StackPanel HorizontalAlignment="Center">
+                    <wpfui:SymbolIcon Symbol="Info24" FontSize="22" HorizontalAlignment="Center"
+                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                    <TextBlock Text="关于" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                </StackPanel>
+            </RadioButton>
+
+            <RadioButton DockPanel.Dock="Bottom" GroupName="Nav"
+                         Checked="NavButton_Checked" Tag="2"
+                         Style="{StaticResource SidebarNavButton}">
+                <StackPanel HorizontalAlignment="Center">
+                    <wpfui:SymbolIcon Symbol="Settings24" FontSize="22" HorizontalAlignment="Center"
+                                      Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                    <TextBlock Text="设置" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                </StackPanel>
+            </RadioButton>
+        </DockPanel>
+
+        <!-- ── 内容区 ── -->
+        <Grid Grid.Column="1" Grid.Row="1" ClipToBounds="True">
+
+            <!-- ═══ 首页 ═══ -->
+            <Border x:Name="HomePage" Visibility="Collapsed" Opacity="0">
+                <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 固定不动的上半部分：路由开关 + 显示器映射 + 会话标题 -->
+                    <StackPanel Grid.Row="0" Margin="24,20,24,0">
+                        <wpfui:CardControl Margin="0,0,0,20">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="Speaker224" FontSize="22"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="音频路由" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="按窗口所在的显示器自动切换输出设备" FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <wpfui:ToggleSwitch IsChecked="{Binding IsRoutingEnabled}"/>
+                        </wpfui:CardControl>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="显示器映射" FontSize="20" FontWeight="Medium" VerticalAlignment="Center"/>
+                            <!-- 按显示器型号自动配对音频端点（HDMI/DP 端点名里常带显示器型号） -->
+                            <wpfui:Button Grid.Column="1" Content="自动匹配" Icon="Sparkle24"
+                                          Margin="0,0,8,0" VerticalAlignment="Center"
+                                          Command="{Binding AutoMatchCommand}"
+                                          ToolTip="按显示器型号自动配对音频设备；只填补未映射的显示器，不覆盖手动选择"/>
+                            <wpfui:Button Grid.Column="2" Icon="ArrowClockwise24" Appearance="Transparent"
+                                          Command="{Binding RefreshCommand}" ToolTip="重新枚举显示器与音频设备"
+                                          Width="32" Height="32"/>
+                        </Grid>
+
+                        <!-- 自动匹配结果提示（按钮点击后才有内容） -->
+                        <TextBlock Text="{Binding AutoMatchStatus}" FontSize="12" TextWrapping="Wrap"
+                                   Margin="0,0,0,12"
+                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   Visibility="{Binding AutoMatchStatus, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                        <!-- 最近一次路由结果：成功/失败（失败含 HRESULT）。排查「拖了窗口没反应」先看这行 -->
+                        <Border Margin="0,0,0,12" Padding="12,8" CornerRadius="4"
+                                Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                                Visibility="{Binding LastRoutingStatus, Converter={StaticResource StringToVisibilityConverter}}">
+                            <StackPanel Orientation="Horizontal">
+                                <wpfui:SymbolIcon Symbol="Info24" FontSize="14" VerticalAlignment="Center"
+                                                  Margin="0,0,8,0"
+                                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                <TextBlock Text="{Binding LastRoutingStatus}" FontSize="12" TextWrapping="Wrap"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <ItemsControl ItemsSource="{Binding Monitors}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <wpfui:Card Margin="0,0,0,8" Padding="16">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- 显示器图标 -->
+                                            <wpfui:SymbolIcon Grid.Column="0" Symbol="Desktop24" FontSize="24"
+                                                              Margin="0,0,14,0" VerticalAlignment="Center"
+                                                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+
+                                            <!-- 显示器信息 -->
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold"/>
+                                                    <Border Margin="8,0,0,0" Padding="8,2" CornerRadius="4"
+                                                            Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                                            Visibility="{Binding Monitor.IsPrimary, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="主屏" FontSize="10" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"/>
+                                                    </Border>
+                                                    <!-- 「自动」徽章：这条映射是按显示器型号自动配的，鼠标悬停看理由 -->
+                                                    <Border Margin="8,0,0,0" Padding="8,2" CornerRadius="4"
+                                                            Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                                            ToolTip="{Binding MatchReason}"
+                                                            Visibility="{Binding IsAutoMatched, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="自动" FontSize="10" FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                    </Border>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding Monitor.DeviceName}" FontSize="11"
+                                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                                <!-- 指定过的设备当前不可用：显式警告，避免「默默失效」 -->
+                                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0"
+                                                            Visibility="{Binding IsDeviceMissing, Converter={StaticResource BoolToVis}}">
+                                                    <wpfui:SymbolIcon Symbol="Warning24" FontSize="13" VerticalAlignment="Center"
+                                                                      Margin="0,0,6,0"
+                                                                      Foreground="{DynamicResource SystemFillColorCautionBrush}"/>
+                                                    <TextBlock Text="{Binding MissingDeviceHint}" FontSize="11" TextWrapping="Wrap"
+                                                               MaxWidth="420" HorizontalAlignment="Left"
+                                                               Foreground="{DynamicResource SystemFillColorCautionBrush}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <!-- 设备选择 + 音量 -->
+                                            <StackPanel Grid.Column="2" MinWidth="280">
+                                                <ComboBox ItemsSource="{Binding AvailableDevices}"
+                                                          SelectedItem="{Binding SelectedAudioDevice}"
+                                                          DisplayMemberPath="FriendlyName"/>
+
+                                                <!-- 音量滑块：只在选了具体设备时出现 -->
+                                                <Grid Margin="0,10,0,0"
+                                                      Visibility="{Binding HasDevice, Converter={StaticResource BoolToVis}}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <wpfui:SymbolIcon Grid.Column="0" Symbol="Speaker224" FontSize="16"
+                                                                      VerticalAlignment="Center" Margin="0,0,10,0"
+                                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                    <Slider Grid.Column="1" Minimum="0" Maximum="100"
+                                                            Value="{Binding Volume, Mode=TwoWay}"
+                                                            VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding Volume, StringFormat={}{0}%}"
+                                                               FontSize="12" MinWidth="36" TextAlignment="Right"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </wpfui:Card>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 正在运行的程序：每行可以直接分配扬声器 + 决定是否记入清单 -->
+                        <StackPanel Margin="0,20,0,12">
+                            <TextBlock Text="正在运行的程序" FontSize="20" FontWeight="Medium"/>
+                            <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}">
+                                右侧下拉框可以直接给这个程序指定扬声器；勾上「记入清单」后下次启动沿用它
+                                （启动时先按清单分配，清单之外的程序再按窗口所在显示器自动分配）。
+                            </TextBlock>
+                            <TextBlock Text="{Binding AssignmentStatus}" FontSize="11" TextWrapping="Wrap"
+                                       Margin="0,6,0,0"
+                                       Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                       Visibility="{Binding AssignmentStatus, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 可滚动的会话列表 -->
+                    <Border Grid.Row="1" Margin="24,0,24,16" MinHeight="80"
+                            Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <!-- TabNavigation=Once：Tab 落到第一行，之后用方向键在行间移动 -->
+                                <ItemsControl ItemsSource="{Binding ActiveSessions}"
+                                              KeyboardNavigation.TabNavigation="Once"
+                                              KeyboardNavigation.DirectionalNavigation="Contained">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <!-- Tag 把该行的会话对象带进 ContextMenu（弹出层不在可视化树里，
+                                                 拿不到 DataContext），右键菜单打开时通过 PlacementTarget.Tag 取回。 -->
+                                            <Border Padding="20,10"
+                                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                                    BorderThickness="0,0,0,1"
+                                                    Tag="{Binding}"
+                                                    Focusable="True"
+                                                    KeyboardNavigation.IsTabStop="True"
+                                                    AutomationProperties.Name="{Binding ProcessName, StringFormat='音频会话 {0}。右侧下拉框可以分配扬声器，按菜单键或 Shift+F10 可打开同一菜单。'}"
+                                                    ContextMenuOpening="SessionRow_ContextMenuOpening"
+                                                    PreviewKeyDown="SessionRow_PreviewKeyDown">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Background" Value="Transparent"/>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                                                <Setter Property="Background"
+                                                                        Value="{DynamicResource SubtleFillColorSecondaryBrush}"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <Border.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem x:Name="PinToDeviceMenu" Header="分配扬声器"/>
+                                                        <Separator x:Name="PinSeparator"/>
+                                                        <MenuItem x:Name="RemovePinMenu" Header="取消分配"
+                                                                  Click="RemovePin_Click"/>
+                                                    </ContextMenu>
+                                                </Border.ContextMenu>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" MinWidth="140"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                        <ColumnDefinition Width="210"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- 应用名 + 已分配徽章 -->
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <Image Source="{Binding Icon}" Width="20" Height="20"
+                                                               Margin="0,0,10,0" VerticalAlignment="Center"
+                                                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                        <StackPanel VerticalAlignment="Center">
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding ProcessName}" FontSize="13" FontWeight="Medium"/>
+                                                                <wpfui:SymbolIcon Symbol="Pin24" FontSize="13"
+                                                                                  Margin="6,0,0,0" VerticalAlignment="Center"
+                                                                                  Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                                                                  ToolTip="该程序已按清单分配扬声器"
+                                                                                  Visibility="{Binding IsOverridden, Converter={StaticResource BoolToVis}}"/>
+                                                            </StackPanel>
+                                                            <TextBlock Text="{Binding ProcessId, StringFormat='进程 {0}'}" FontSize="11"
+                                                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                    <!-- 窗口所在显示器（自动分配的依据） -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="窗口在" FontSize="10"
+                                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                                                        <TextBlock Text="{Binding MonitorName}"
+                                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                   FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+
+                                                    <!-- 扬声器：直接给这个程序分配输出设备 -->
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <ComboBox ItemsSource="{Binding AssignmentOptions}"
+                                                                  SelectedItem="{Binding SelectedAssignment, Mode=TwoWay}"
+                                                                  DisplayMemberPath="FriendlyName"
+                                                                  AutomationProperties.Name="{Binding ProcessName, StringFormat='{}{0} 的扬声器'}"
+                                                                  ToolTip="给这个程序单独指定扬声器；选「自动」则跟随窗口所在显示器"/>
+                                                        <TextBlock Text="{Binding AudioDeviceName, StringFormat='现在输出：{0}'}"
+                                                                   FontSize="10" Margin="0,3,0,0"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                                                    </StackPanel>
+
+                                                    <!-- 记入清单 -->
+                                                    <CheckBox Grid.Column="3" Content="记入清单"
+                                                              VerticalAlignment="Center" Margin="14,0,0,0"
+                                                              IsChecked="{Binding IsRemembered, Mode=TwoWay}"
+                                                              AutomationProperties.Name="{Binding ProcessName, StringFormat='把 {0} 记入清单'}"
+                                                              ToolTip="勾上：分配到清单里，下次启动沿用；不勾：只对本次运行有效"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Visibility="{Binding ActiveSessions.Count, Converter={StaticResource ZeroToVis}}"
+                                        IsHitTestVisible="False">
+                                <wpfui:SymbolIcon Symbol="Speaker224" FontSize="32" Opacity="0.3"
+                                                  HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="当前没有正在出声的程序" FontSize="13"
+                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="打开音频路由并播放一点声音即可看到" FontSize="11"
+                                           Foreground="{DynamicResource TextFillColorDisabledBrush}"
+                                           HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ═══ 应用清单（按应用分配扬声器） ═══ -->
+            <Border x:Name="PinnedPage" Visibility="Collapsed" Opacity="0">
+                <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+                <Grid Margin="24,20,24,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 说明 -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,14">
+                        <TextBlock Text="应用清单" FontSize="20" FontWeight="Medium"/>
+                        <TextBlock TextWrapping="Wrap" FontSize="12"
+                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   Margin="0,4,0,0">
+                            清单里的程序永远从指定扬声器出声，窗口放在哪台显示器上都不受影响。
+                            启动时<Run FontWeight="SemiBold">先按清单分配</Run>，清单之外的程序再按窗口所在显示器
+                            自动分配。勾了「记入清单」的条目会保存下来、下次启动沿用；取消勾选则只对本次运行有效。
+                        </TextBlock>
+                        <TextBlock Text="{Binding AssignmentStatus}" FontSize="11" TextWrapping="Wrap"
+                                   Margin="0,6,0,0"
+                                   Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                   Visibility="{Binding AssignmentStatus, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    </StackPanel>
+
+                    <!-- 加入清单：给一个正在运行的程序分配扬声器 -->
+                    <wpfui:CardControl Grid.Row="1" Margin="0,0,0,12">
+                        <wpfui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <wpfui:SymbolIcon Symbol="Add24" FontSize="18"
+                                                  Margin="0,0,12,0" VerticalAlignment="Center"
+                                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="给一个正在运行的程序分配扬声器" FontSize="13" FontWeight="SemiBold"/>
+                                    <TextBlock Text="选程序、选扬声器，然后加入清单 —— 它下次启动时（甚至还没出声）就会落到这台设备上"
+                                               FontSize="11" TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left"
+                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </wpfui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="程序" VerticalAlignment="Center" Margin="0,0,10,0"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <ComboBox Grid.Column="1" MinWidth="140" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding RunningProcesses}"
+                                      SelectedItem="{Binding SelectedRunningProcess}"
+                                      DisplayMemberPath="ProcessName"
+                                      AutomationProperties.Name="要分配的程序"
+                                      ToolTip="当前正在运行的进程（不含本程序）"/>
+
+                            <TextBlock Grid.Column="2" Text="扬声器" VerticalAlignment="Center" Margin="14,0,10,0"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <ComboBox Grid.Column="3" MinWidth="160" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding SpeakerChoices}"
+                                      SelectedItem="{Binding NewAssignmentDevice}"
+                                      DisplayMemberPath="FriendlyName"
+                                      AutomationProperties.Name="要分配的扬声器"
+                                      ToolTip="这台程序以后固定从这个设备出声"/>
+
+                            <wpfui:Button Grid.Column="4" Content="加入清单" Icon="Add24"
+                                          Margin="12,0,0,0"
+                                          Command="{Binding AddToChecklistCommand}"/>
+                            <wpfui:Button Grid.Column="5" Icon="ArrowClockwise24" Appearance="Transparent"
+                                          Width="32" Height="32" Margin="4,0,0,0"
+                                          Command="{Binding RefreshRunningProcessesCommand}"
+                                          ToolTip="重新枚举正在运行的程序"/>
+                        </Grid>
+                    </wpfui:CardControl>
+
+                    <!-- 清单本体 -->
+                    <Border Grid.Row="2" MinHeight="80"
+                            Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="8">
+                        <Grid>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding AppOverrides}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="20,10"
+                                                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                                    BorderThickness="0,0,0,1" Background="Transparent">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*" MinWidth="120"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="220"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- 图标位：拿到过就显示程序图标，否则显示一个图钉字形 -->
+                                                    <Grid Grid.Column="0" Width="20" Height="20"
+                                                          Margin="0,0,12,0" VerticalAlignment="Center">
+                                                        <Image Source="{Binding Icon}" Width="20" Height="20"
+                                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                                               Visibility="{Binding Icon, Converter={StaticResource NotNullToVis}}"/>
+                                                        <wpfui:SymbolIcon Symbol="Pin24" FontSize="18"
+                                                                          Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"
+                                                                          Visibility="{Binding Icon, Converter={StaticResource NullToVis}}"/>
+                                                    </Grid>
+
+                                                    <!-- 程序名 + 设备名 -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding ProcessName}"
+                                                                   FontSize="13" FontWeight="Medium"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding AudioDeviceName}" FontSize="10"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+                                                    </StackPanel>
+
+                                                    <!-- 运行中徽章 -->
+                                                    <Border Grid.Column="2" Padding="8,2" CornerRadius="4"
+                                                            Margin="0,0,10,0" VerticalAlignment="Center"
+                                                            Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="运行中" FontSize="10"
+                                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                    </Border>
+
+                                                    <!-- 记入清单 -->
+                                                    <CheckBox Grid.Column="3" Content="记入清单"
+                                                              VerticalAlignment="Center" Margin="0,0,12,0"
+                                                              IsChecked="{Binding IsRemembered, Mode=TwoWay}"
+                                                              AutomationProperties.Name="{Binding ProcessName, StringFormat='把 {0} 记入清单'}"
+                                                              ToolTip="勾上：写进设置文件，下次启动沿用；不勾：只对本次运行有效"/>
+
+                                                    <!-- 扬声器：可以在清单里直接改 -->
+                                                    <ComboBox Grid.Column="4" VerticalAlignment="Center"
+                                                              ItemsSource="{Binding AssignmentOptions}"
+                                                              SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
+                                                              DisplayMemberPath="FriendlyName"
+                                                              AutomationProperties.Name="{Binding ProcessName, StringFormat='{}{0} 的扬声器'}"
+                                                              ToolTip="改分配到另一台扬声器；选「自动」等于把这条从清单里去掉"/>
+
+                                                    <wpfui:Button Grid.Column="5" Icon="Delete24"
+                                                                  Appearance="Transparent" Width="32" Height="32"
+                                                                  Margin="8,0,0,0"
+                                                                  ToolTip="取消分配（之后按窗口所在显示器自动分配）"
+                                                                  Tag="{Binding}"
+                                                                  Click="RemovePinFromList_Click"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Visibility="{Binding AppOverrides.Count, Converter={StaticResource ZeroToVis}}"
+                                        IsHitTestVisible="False">
+                                <wpfui:SymbolIcon Symbol="Pin24" FontSize="32" Opacity="0.3"
+                                                  HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                                <TextBlock Text="清单还是空的" FontSize="13"
+                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center"/>
+                                <TextBlock Text="用上面的下拉框选一个程序，或者回首页给正在出声的程序分配" FontSize="11"
+                                           Foreground="{DynamicResource TextFillColorDisabledBrush}"
+                                           HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ═══ 设置 ═══ -->
+            <Border x:Name="SettingsPage" Visibility="Collapsed" Opacity="0">
+                <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,20,24,8">
+                    <StackPanel>
+                        <TextBlock Text="设置" FontSize="20" FontWeight="Medium" Margin="0,0,0,16"/>
+
+                        <!-- 主题 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="DarkTheme24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="主题" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="浅色、深色，或跟随系统设置" FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <ComboBox ItemsSource="{Binding ThemeOptions}"
+                                      SelectedIndex="{Binding SelectedThemeIndex}"
+                                      MinWidth="120"/>
+                        </wpfui:CardControl>
+
+                        <!-- 开机自启 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="Power24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="开机自启" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="登录 Windows 后自动启动（写入当前用户的启动项）" FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <wpfui:ToggleSwitch IsChecked="{Binding AutoStartWithWindows}"/>
+                        </wpfui:CardControl>
+
+                        <!-- 关闭时最小化到托盘 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="ArrowMinimize24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="关闭时最小化到托盘" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="点关闭按钮只是收起窗口，路由继续在托盘里运行（从托盘菜单退出）" FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <wpfui:ToggleSwitch IsChecked="{Binding MinimizeOnClose}"/>
+                        </wpfui:CardControl>
+
+                        <!-- 启动时最小化 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="EyeOff24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="启动时最小化" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="启动后只留托盘图标，不弹出窗口（配合开机自启更安静）" FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <wpfui:ToggleSwitch IsChecked="{Binding StartMinimized}"/>
+                        </wpfui:CardControl>
+
+                        <!-- 启动时自动匹配 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="Sparkle24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="启动时按型号自动匹配" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="HDMI / DP 音频端点名里通常带着显示器型号（如 T214F06）；打开后只填补还没有映射的显示器，手动选择永远优先" FontSize="11"
+                                                   TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <wpfui:ToggleSwitch IsChecked="{Binding AutoMatchOnStartup}"/>
+                        </wpfui:CardControl>
+
+                        <!-- 虚拟通道：程序先落到静音虚拟声卡，再由我们按显示器送到真正的设备 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="Speaker224" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="虚拟通道（进程级）" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="把程序先接到一台静音虚拟声卡上，再按窗口所在显示器送到真正的音箱。程序只需重启一次，之后拖窗口永远不用重启 —— 专治「只在启动时读一次输出设备」的游戏 / 模拟器 / 播放器。"
+                                                   FontSize="11" TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <StackPanel>
+                                <wpfui:ToggleSwitch IsChecked="{Binding VirtualModeEnabled}" HorizontalAlignment="Left"/>
+
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="虚拟声卡" VerticalAlignment="Center" Margin="0,0,10,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding VirtualSinks}"
+                                              SelectedItem="{Binding SelectedVirtualSink}"
+                                              DisplayMemberPath="FriendlyName" MinWidth="220"
+                                              HorizontalAlignment="Left"/>
+                                    <wpfui:Button Grid.Column="2" Content="重新扫描" Icon="ArrowClockwise24"
+                                                  Margin="8,0,0,0" Appearance="Transparent"
+                                                  Command="{Binding RefreshVirtualSinksCommand}"/>
+                                </Grid>
+
+                                <TextBlock Text="{Binding VirtualModeStatus}" FontSize="11" TextWrapping="Wrap"
+                                           Margin="0,10,0,0" MaxWidth="560" HorizontalAlignment="Left"
+                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <wpfui:Button Content="纳入当前正在出声的程序" Icon="Add24"
+                                                  Command="{Binding AddActiveSessionsToVirtualCommand}"/>
+                                    <wpfui:Button Content="清空" Appearance="Transparent" Margin="8,0,0,0"
+                                                  Command="{Binding ClearManagedProcessesCommand}"/>
+                                </StackPanel>
+
+                                <ItemsControl ItemsSource="{Binding ManagedProcesses}" Margin="0,8,0,0">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                                                    CornerRadius="10" Padding="10,4" Margin="0,0,6,6">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding}" FontSize="12" VerticalAlignment="Center"/>
+                                                    <Button Content="✕" Tag="{Binding}" Click="RemoveManagedProcess_Click"
+                                                            BorderThickness="0" Background="Transparent" Padding="6,0,0,0"
+                                                            FontSize="10" VerticalAlignment="Center" Cursor="Hand"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </wpfui:CardControl>
+
+                        <!-- 诊断：一次点击拿到可复制的完整状态报告 + 日志入口 -->
+                        <wpfui:CardControl Margin="0,0,0,8">
+                            <wpfui:CardControl.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <wpfui:SymbolIcon Symbol="Wrench24" FontSize="20"
+                                                      Margin="0,0,14,0" VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="诊断" FontSize="14" FontWeight="SemiBold"/>
+                                        <TextBlock Text="路由没生效时先点这里：自检会试调一次系统接口（只作用于本程序自身并立即清除），把接口、显示器映射、应用清单、活动会话与最近一次路由结果一起列出来" FontSize="11"
+                                                   TextWrapping="Wrap" MaxWidth="460" HorizontalAlignment="Left"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </wpfui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <wpfui:Button Content="运行自检" Icon="Play24"
+                                              Command="{Binding RunDiagnosticsCommand}"/>
+                                <wpfui:Button Content="依次试听各设备" Icon="Speaker224"
+                                              Margin="8,0,0,0"
+                                              Command="{Binding TestDevicesCommand}"
+                                              ToolTip="在每台音频设备上依次播一声提示音，用来分辨「设备本身不响」和「路由没生效」"/>
+                                <wpfui:Button Content="打开日志" Icon="DocumentText24" Appearance="Transparent"
+                                              Margin="8,0,0,0"
+                                              Command="{Binding OpenLogFolderCommand}"
+                                              ToolTip="{Binding LogFilePath}"/>
+                            </StackPanel>
+                        </wpfui:CardControl>
+
+                        <!-- 自检报告：可选中复制（发出来就能定位问题） -->
+                        <Border Margin="0,0,0,8"
+                                Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8"
+                                Visibility="{Binding DiagnosticsReport, Converter={StaticResource StringToVisibilityConverter}}">
+                            <TextBox Text="{Binding DiagnosticsReport, Mode=OneWay}"
+                                     IsReadOnly="True" AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Consolas" FontSize="12"
+                                     MaxHeight="320"
+                                     VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     Background="Transparent" BorderThickness="0"
+                                     Padding="12"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- ═══ 关于 ═══ -->
+            <Border x:Name="AboutPage" Visibility="Collapsed" Opacity="0">
+                <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,20,24,8">
+                    <StackPanel>
+                        <TextBlock Text="关于" FontSize="20" FontWeight="Medium" Margin="0,0,0,16"/>
+                        <wpfui:Card Padding="24">
+                            <StackPanel>
+                                <!-- ── 头部：图标 + 名称/版本/版权 ── -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Image Source="/Assets/app-icon.png" Width="48" Height="48"
+                                           VerticalAlignment="Center" Margin="0,0,16,0"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="VideoTurner" FontSize="18" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding AppVersionDisplay}" FontSize="12"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                        <TextBlock Text="{Binding CopyrightDisplay}" FontSize="12" TextWrapping="Wrap"
+                                                   MaxWidth="520" HorizontalAlignment="Left"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Border Height="1" Background="{DynamicResource ControlStrokeColorDefaultBrush}" Margin="0,0,0,16"/>
+
+                                <TextBlock Text="它做什么" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <TextBlock TextWrapping="Wrap" FontSize="13"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           Margin="0,0,0,20">
+                                    给每台显示器指定一个音频输出设备：程序窗口被拖到哪台显示器上，它的声音就从那台显示器对应的音箱/耳机里出来。
+                                    映射可以按显示器型号自动匹配，也可以随时在首页手动指定；正在运行的程序还能单独分配扬声器并「记入清单」——
+                                    启动时先按清单分配，清单之外的再按窗口所在显示器自动分配。
+                                </TextBlock>
+
+                                <TextBlock Text="已知限制" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <TextBlock TextWrapping="Wrap" FontSize="13"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                           Margin="0,0,0,20">
+                                    1. Windows 没有原生的「按显示器路由音频」，本程序通过未公开的
+                                    AudioPolicyConfig 接口按「进程」设置输出设备，因此粒度是进程而不是窗口：
+                                    同一个程序开了多个窗口分放在不同显示器上时，声音无法再细分，会跟随它的主窗口所在的那台显示器。
+                                    2. 系统更新有可能改动该未公开接口，届时需要跟随适配。
+                                    3. **有些程序只在启动时读取一次输出设备**（游戏、模拟器客户端居多）：运行中改策略不会迁移它已经在播的声音，需要重启该程序；想以后免重启，
+                                    可以在首页给它分配扬声器并勾「记入清单」—— 清单里的程序一启动就会先把策略设好。
+                                    遇到这种情况首页状态行会直接写明。程序现在也会自动区分「路由失败」与「策略已生效但对方没搬」。
+                                    4. 最小化的播放器窗口可能被认错显示器（继承自上游的已知缺陷），
+                                    表现为「一最小化声音就跑回原来的设备」。
+                                    5. 首次使用若听到声音被切走，请确认首页的映射是否符合预期，或直接关掉「音频路由」开关；
+                                    拿不准时先点「设置 → 诊断 → 运行自检」，或先用 --dry-run 打开看看。
+                                </TextBlock>
+
+                                <TextBlock Text="开源许可" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <TextBlock Text="{Binding LicenseNotice}" TextWrapping="Wrap" FontSize="13"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                        </wpfui:Card>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+        </Grid>
+    </Grid>
+</wpfui:UiWindow>

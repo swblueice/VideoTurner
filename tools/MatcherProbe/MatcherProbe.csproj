@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    只读探针：引用 VideoTurner 的模型/服务源码（不复制），在实际机器上打印
+    显示器、音频端点，以及「按显示器型号自动匹配」的结果。
+    用途是验证 AudioEndpointMatcher 的匹配规则，不启动 GUI、不改任何路由设置。
+    运行方式：dotnet run （在 tools\MatcherProbe 目录下）
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SupportedOSPlatform>windows10.0.17763.0</SupportedOSPlatform>
+    <RootNamespace>MatcherProbe</RootNamespace>
+    <AssemblyName>MatcherProbe</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\VideoTurner\Models\*.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\DisplayConfig.cs" />
+    <Compile Include="..\..\src\VideoTurner\Interop\NativeMethods.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioEndpointMatcher.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\AudioDeviceService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\DeviceContainerService.cs" />
+    <Compile Include="..\..\src\VideoTurner\Services\MonitorService.cs" />
+  </ItemGroup>
+
+</Project>
