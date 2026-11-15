@@ -57,6 +57,7 @@ jobs:
           $files += Get-ChildItem dist/installer -Filter '*.exe' -ErrorAction SilentlyContinue
           $files += Get-ChildItem dist/installer -Filter '*.sha256.txt' -ErrorAction SilentlyContinue
           $files += Get-ChildItem dist/portable -Filter '*.zip' -ErrorAction SilentlyContinue
+          $files += Get-ChildItem dist/portable -Filter '*.sha256.txt' -ErrorAction SilentlyContinue
           if ($files.Count -eq 0) { throw "没有找到任何产物" }
           $files | ForEach-Object { "  {0}  {1:N1} MB" -f $_.Name, ($_.Length / 1MB) }
           $list = ($files | ForEach-Object { $_.FullName }) -join "`n"
