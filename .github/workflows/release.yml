@@ -63,7 +63,7 @@ jobs:
           "FILES<<EOF`n$list`nEOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: 发布到 GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           name: VideoTurner ${{ github.event.inputs.tag || github.ref_name }}
